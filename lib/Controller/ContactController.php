@@ -115,7 +115,7 @@ class ContactController extends Controller {
 			return new JSONResponse();
 		}
 
-		$result = $this->contactsManager->search($search, ['FN', 'EMAIL']);
+		$result = $this->contactsManager->search($search, ['FN', 'EMAIL', 'CATEGORIES']);
 
 		$contacts = [];
 		foreach ($result as $r) {
@@ -131,6 +131,10 @@ class ContactController extends Controller {
 			$name = $this->getNameFromContact($r);
 			if (\is_string($r['EMAIL'])) {
 				$r['EMAIL'] = [$r['EMAIL']];
+			}
+
+			if(isset($r['CATEGORIES'])) {
+				$categories = explode(',', $r['CATEGORIES']);
 			}
 
 			$photo = isset($r['PHOTO'])
@@ -161,6 +165,7 @@ class ContactController extends Controller {
 				'lang' => $lang,
 				'tzid' => $timezoneId,
 				'photo' => $photo,
+				'categories' => $categories ?? [],
 			];
 		}
 
