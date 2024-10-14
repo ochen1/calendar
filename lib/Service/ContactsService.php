@@ -10,83 +10,108 @@ namespace OCA\Calendar\Service;
 class ContactsService {
 
 
-	public function isSystemBook(array $r): bool {
+	/**
+	 * @param array $contact
+	 * @return bool
+	 */
+	public function isSystemBook(array $contact): bool {
 		// Information about system users is fetched via DAV nowadays
 		return (isset($contact['isLocalSystemBook']) && $contact['isLocalSystemBook'] === true);
 	}
 
-	public function hasEmail(array $r): bool {
-		return !isset($r['EMAIL']);
+	/**
+	 * @param array $contact
+	 * @return bool
+	 */
+	public function hasEmail(array $contact): bool {
+		return isset($contact['EMAIL']);
 	}
 
 	/**
 	 * Extract name from an array containing a contact's information
 	 *
-	 * @param array $r
+	 * @param array $contact
 	 * @return string
 	 */
-	public function getNameFromContact(array $r): string {
-		return $r['FN'] ?? '';
+	public function getNameFromContact(array $contact): string {
+		return $contact['FN'] ?? '';
 	}
 
 	/**
 	 * Get photo uri from contact
 	 *
-	 * @param string $raw
+	 * @param array $contact
 	 * @return string|null
 	 */
-	public function getPhotoUri(array $r): ?string {
-		if (!isset($r['PHOTO'])) {
+	public function getPhotoUri(array $contact): ?string {
+		if (!isset($contact['PHOTO'])) {
 			return null;
 		}
 
-		$raw = $r['PHOTO'];
+		$raw = $contact['PHOTO'];
 		$uriPrefix = 'VALUE=uri:';
 		if (str_starts_with($raw, $uriPrefix)) {
-			return substr($raw, strpos($raw, 'http'));
+			$strpos = strpos($raw, 'http');
+			return $strpos !== false ? substr($raw, $strpos) : null;
 		}
 
 		return null;
 	}
 
-	public function getEmail(array $r): array {
-		if (\is_string($r['EMAIL'])) {
-			return [$r['EMAIL']];
+	/**
+	 * @param array $contact
+	 * @return string[]
+	 */
+	public function getEmail(array $contact): array {
+		if (\is_string($contact['EMAIL'])) {
+			return [$contact['EMAIL']];
 		}
-		return $r['EMAIL'];
+		return $contact['EMAIL'];
 	}
 
-	public function getTimezoneId(array $r): ?string {
-		if (!isset($r['TZ'])) {
+	/**
+	 * @param array $contact
+	 * @return string|null
+	 */
+	public function getTimezoneId(array $contact): ?string {
+		if (!isset($contact['TZ'])) {
 			return null;
 		}
 
-		if (\is_array($r['TZ'])) {
-			return $r['TZ'][0];
+		if (\is_array($contact['TZ'])) {
+			return $contact['TZ'][0];
 		}
-		return $r['TZ'];
+		return $contact['TZ'];
 	}
 
-	public function getLanguageId(array $r): ?string {
-		if (!isset($r['LANG'])) {
+	/**
+	 * @param array $contact
+	 * @return string|null
+	 */
+	public function getLanguageId(array $contact): ?string {
+		if (!isset($contact['LANG'])) {
 			return null;
 		}
 
-		if (\is_array($r['LANG'])) {
-			return $r['LANG'][0];
+		if (\is_array($contact['LANG'])) {
+			return $contact['LANG'][0];
 		}
-		return $r['LANG'];
+		return $contact['LANG'];
 	}
 
+	/**
+	 * @param array $groups
+	 * @param string $search
+	 * @return array
+	 */
 	public function filterGroupsWithCount(array $groups, string $search): array {
 		//filter to be unique
-		$categoryMem = [];
+		$categories = [];
 		foreach ($groups as $group) {
-			$categoryNames = explode(',', $group['CATEGORIES']);
-			$categoryMem[] = array_filter($categoryNames, static function ($cat) use ($search) {
+			$categories[] = array_filter(explode(',', $group['CATEGORIES']), static function ($cat) use ($search) {
 				return str_contains(strtolower($cat), $search);
 			});
 		}
-		return array_count_values(array_merge(...$categoryMem));
+		return array_count_values(array_merge(...$categories));
 	}
 }
