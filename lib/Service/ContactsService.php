@@ -24,7 +24,19 @@ class ContactsService {
 	 * @return bool
 	 */
 	public function hasEmail(array $contact): bool {
-		return isset($contact['EMAIL']);
+		if (!isset($contact['EMAIL'])) {
+			return false;
+		}
+
+		if (!is_array($contact['EMAIL']) && !empty($contact['EMAIL'])) {
+			return true;
+		}
+
+		if (!empty($contact['EMAIL'][0])) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

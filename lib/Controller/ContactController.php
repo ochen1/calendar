@@ -128,8 +128,14 @@ class ContactController extends Controller {
 		}
 		
 		$groups = $this->contactsManager->search($search, ['CATEGORIES']);
+		$groups = array_filter($groups, function ($group) {
+			return $this->contactsService->hasEmail($group);
+		});
 		$filtered = $this->contactsService->filterGroupsWithCount($groups, $search);
 		foreach ($filtered as $groupName => $count) {
+			if ($count === 0) {
+				continue;
+			}
 			$contacts[] = [
 				'name' => $groupName,
 				'emails' => ['mailto:group+' . urlencode($groupName) . '@group'],
@@ -150,9 +156,12 @@ class ContactController extends Controller {
 			return new JSONResponse();
 		}
 
-		$groupmembers = $this->contactsManager->search($groupName, ['CATEGORIES'], ['strict_search' => true]);
+		$groupmembers = $this->contactsManager->search($groupName, ['CATEGORIES']);
 		$contacts = [];
 		foreach ($groupmembers as $r) {
+			if (!in_array($groupName, explode(',', $r['CATEGORIES']), true)) {
+				continue;
+			}
 			if (!$this->contactsService->hasEmail($r) || $this->contactsService->isSystemBook($r)) {
 				continue;
 			}
@@ -162,13 +171,14 @@ class ContactController extends Controller {
 			$timezoneId = $this->contactsService->getTimezoneId($r);
 			$lang = $this->contactsService->getLanguageId($r);
 			$contacts[] = [
-				'name' => $name,
-				'emails' => $email,
-				'lang' => $lang,
-				'tzid' => $timezoneId,
-				'photo' => $photo,
+				'commonName' => $name,
+				'email' => $email[0],
 				'calendarUserType' => 'INDIVIDUAL',
-				'member' => 'mailto:group+' . $groupName . '@group',
+				'language' => $lang,
+				'timezoneId' => $timezoneId,
+				'avatar' => $photo,
+				'isUser' => false,
+				'member' => 'mailto:group+' . urlencode($groupName) . '@group',
 			];
 		}
 		return new JSONResponse($contacts);

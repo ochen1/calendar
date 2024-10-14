@@ -37,10 +37,10 @@
 					<div>
 						{{ option.commonName }}
 					</div>
-					<div v-if="option.email !== option.commonName && option.type !== 'circle'">
+					<div v-if="option.email !== option.commonName && option.type !== 'circle' && option.type !== 'contactsgroup'">
 						{{ option.email }}
 					</div>
-					<div v-if="option.type === 'circle'">
+					<div v-if="option.type === 'circle' || option.type === 'contactsgroup'">
 						{{ option.subtitle }}
 					</div>
 				</div>
@@ -163,8 +163,18 @@ export default {
 			}
 			if (selectedValue.type === 'contactsgroup') {
 				showInfo(this.$t('calendar', 'Note that members of contact groups get invited but are not synced yet.'))
-				this.getContactGroupMembers(selectedValue.name)
-				return;
+				this.getContactGroupMembers(selectedValue.commonName)
+				let group = {
+					calendarUserType: 'GROUP',
+					commonName: selectedValue.commonName,
+					dropdownName: selectedValue.dropdownName,
+					email: selectedValue.email,
+					isUser: false,
+					subtitle: selectedValue.subtitle,
+					type: 'contactsgroup',
+				}
+				this.$emit('add-attendee', group)
+				return
 			}
 			this.$emit('add-attendee', selectedValue)
 		},
@@ -188,8 +198,8 @@ export default {
 		async getContactGroupMembers(groupName) {
 			let results
 			try {
-				response = await HttpClient.post(linkTo('calendar', 'index.php') + '/v1/autocompletion/groupmembers', {
-					search: query,
+				results = await HttpClient.post(linkTo('calendar', 'index.php') + '/v1/autocompletion/groupmembers', {
+					groupName,
 				})
 			} catch (error) {
 				console.debug(error)
@@ -236,12 +246,14 @@ export default {
 						arr.push({
 							calendarUserType: 'GROUP',
 							commonName: result.name,
-							email: this.$n('calendar', '%n member', '%n members', result.members),
+							subtitle: this.$n('calendar', '%n member', '%n members', result.members),
+							members: {length: result.members},
+							email,
 							isUser: false,
 							avatar: result.photo,
 							language: result.lang,
 							timezoneId: result.tzid,
-							hasMultipleEMails,
+							hasMultipleEMails: false,
 							dropdownName: name,
 							type: 'contactsgroup',
 						})
@@ -284,7 +296,7 @@ export default {
 
 				// We do not support GROUPS for now
 				if (principal.calendarUserType === 'GROUP') {
-					return false
+					console.debug(principal)
 				}
 
 				// Do not include resources and rooms
