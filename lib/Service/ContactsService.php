@@ -109,7 +109,7 @@ class ContactsService {
 		$categories = [];
 		foreach ($groups as $group) {
 			$categories[] = array_filter(explode(',', $group['CATEGORIES']), static function ($cat) use ($search) {
-				return str_contains(strtolower($cat), $search);
+				return str_contains(strtolower($cat), strtolower($search));
 			});
 		}
 		return array_count_values(array_merge(...$categories));

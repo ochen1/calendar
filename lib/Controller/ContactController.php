@@ -109,7 +109,7 @@ class ContactController extends Controller {
 
 		$contacts = [];
 		foreach ($result as $r) {
-			if (!$this->contactsService->hasEmail($r) || $this->contactsService->isSystemBook($r)) {
+			if ($this->contactsService->isSystemBook($r) || !$this->contactsService->hasEmail($r)) {
 				continue;
 			}
 			$name = $this->contactsService->getNameFromContact($r);
