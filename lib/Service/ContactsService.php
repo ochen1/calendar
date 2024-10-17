@@ -126,4 +126,19 @@ class ContactsService {
 		}
 		return array_count_values(array_merge(...$categories));
 	}
+
+	/**
+	 * @param array $contact
+	 * @return array
+	 */
+	public function getAddress(array $contact): array {
+		if (\is_string($contact['ADR'])) {
+			$contact['ADR'] = [$contact['ADR']];
+		}
+		$addresses = [];
+		foreach ($contact['ADR'] as $address) {
+			$addresses[] = trim(preg_replace("/\n+/", "\n", str_replace(';', "\n", $address)));
+		}
+		return $addresses;
+	}
 }

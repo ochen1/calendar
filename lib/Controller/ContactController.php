@@ -72,14 +72,7 @@ class ContactController extends Controller {
 
 			$name = $this->contactsService->getNameFromContact($r);
 			$photo = $this->contactsService->getPhotoUri($r);
-
-			if (\is_string($r['ADR'])) {
-				$r['ADR'] = [$r['ADR']];
-			}
-			$addresses = [];
-			foreach ($r['ADR'] as $address) {
-				$addresses[] = trim(preg_replace("/\n+/", "\n", str_replace(';', "\n", $address)));
-			}
+			$addresses = $this->contactsService->getAddress($r);
 
 			$contacts[] = [
 				'name' => $name,
@@ -263,7 +256,7 @@ class ContactController extends Controller {
 			if (!$this->contactsService->hasEmail($r) || $this->contactsService->isSystemBook($r)) {
 				continue;
 			}
-			$email = $this->contactsService->getEmail($r['EMAIL']);
+			$email = $this->contactsService->getEmail($r);
 
 			$match = false;
 			foreach ($email as $e) {
@@ -276,7 +269,7 @@ class ContactController extends Controller {
 				continue;
 			}
 
-			$photo = $this->contactsService->getPhotoUri($r['PHOTO']);
+			$photo = $this->contactsService->getPhotoUri($r);
 			if ($photo === null) {
 				continue;
 			}
@@ -291,4 +284,5 @@ class ContactController extends Controller {
 
 		return new JSONResponse([], Http::STATUS_NOT_FOUND);
 	}
+
 }
