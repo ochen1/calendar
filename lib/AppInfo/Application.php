@@ -51,6 +51,10 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(RenderReferenceEvent::class, CalendarReferenceListener::class);
 
 		$context->registerNotifierService(Notifier::class);
+
+		// TODO: Come up with a better way to load this on demand.
+		//       Then again, the contacts menu/avatar is potentially shown everywhere ...
+		\OCP\Util::addScript(self::APP_ID, 'calendar-contacts-menu');
 	}
 
 	/**

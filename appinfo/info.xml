@@ -56,4 +56,7 @@
 			<order>5</order>
 		</navigation>
 	</navigations>
+	<contactsmenu>
+		<provider>OCA\Calendar\ContactsMenu\AvailabilityModalProvider</provider>
+	</contactsmenu>
 </info>
