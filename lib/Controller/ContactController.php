@@ -131,7 +131,7 @@ class ContactController extends Controller {
 			}
 			$contacts[] = [
 				'name' => $groupName,
-				'emails' => ['mailto:group+' . urlencode($groupName) . '@group'],
+				'emails' => ['mailto:' . urlencode($groupName) . '@group'],
 				'lang' => '',
 				'tzid' => '',
 				'photo' => '',
@@ -171,7 +171,7 @@ class ContactController extends Controller {
 				'timezoneId' => $timezoneId,
 				'avatar' => $photo,
 				'isUser' => false,
-				'member' => 'mailto:group+' . urlencode($groupName) . '@group',
+				'member' => 'mailto:' . urlencode($groupName) . '@group',
 			];
 		}
 		return new JSONResponse($contacts);

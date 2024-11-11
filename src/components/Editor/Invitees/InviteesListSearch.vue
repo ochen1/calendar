@@ -66,6 +66,7 @@ import { linkTo } from '@nextcloud/router'
 import { randomId } from '../../../utils/randomId.js'
 import GoogleCirclesCommunitiesIcon from 'vue-material-design-icons/GoogleCirclesCommunities.vue'
 import { showInfo } from '@nextcloud/dialogs'
+import { removeMailtoPrefix } from '../../../utils/attendee.js'
 
 export default {
 	name: 'InviteesListSearch',
@@ -164,7 +165,7 @@ export default {
 			if (selectedValue.type === 'contactsgroup') {
 				showInfo(this.$t('calendar', 'Note that members of contact groups get invited but are not synced yet.'))
 				this.getContactGroupMembers(selectedValue.commonName)
-				let group = {
+				const group = {
 					calendarUserType: 'GROUP',
 					commonName: selectedValue.commonName,
 					dropdownName: selectedValue.dropdownName,
@@ -238,16 +239,16 @@ export default {
 						name = email
 					}
 
-					if (email && this.alreadyInvitedEmails.includes(email)) {
+					if (email && this.alreadyInvitedEmails.includes(removeMailtoPrefix(email))) {
 						return
 					}
 
-					if(result.type === 'contactsgroup') {
+					if (result.type === 'contactsgroup') {
 						arr.push({
 							calendarUserType: 'GROUP',
 							commonName: result.name,
 							subtitle: this.$n('calendar', '%n member', '%n members', result.members),
-							members: {length: result.members},
+							members: { length: result.members },
 							email,
 							isUser: false,
 							avatar: result.photo,

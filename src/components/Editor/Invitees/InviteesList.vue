@@ -237,14 +237,14 @@ export default {
 				organizers.push({
 					id: owner.id,
 					label: owner.displayname,
-					address: owner.emailAddress
+					address: owner.emailAddress,
 				})
 			}
 			if (principal && owner.id !== principal.id) {
 				organizers.push({
 					id: principal.id,
 					label: principal.displayname,
-					address: principal.emailAddress
+					address: principal.emailAddress,
 				})
 			}
 			return organizers
@@ -305,13 +305,13 @@ export default {
 				const user = this.calendarObjectInstance.organizer
 				organizer = {
 					label: user.commonName,
-					address: removeMailtoPrefix(user.uri)
+					address: removeMailtoPrefix(user.uri),
 				}
 			} else if (this.principalsStore.getCurrentUserPrincipal) {
 				const user = this.principalsStore.getCurrentUserPrincipal
 				organizer = {
 					label: user.displayname,
-					address: user.emailAddress
+					address: user.emailAddress,
 				}
 			}
 			return organizer
@@ -347,6 +347,27 @@ export default {
 			this.recentAttendees.push(address)
 		},
 		addAttendee({ commonName, email, calendarUserType, language, timezoneId, member }) {
+			let modifiedMember = null
+			if (calendarUserType === 'INDIVIDUAL' && member) {
+				const modifiedMemberIndex = this.calendarObjectInstance.attendees.findIndex(function(attendee) {
+					if (attendee.uri === email) {
+						return true
+					}
+					return false
+				})
+				modifiedMember = this.calendarObjectInstance.attendees[modifiedMemberIndex]
+			}
+
+			if (modifiedMember) {
+				const group = modifiedMember.attendeeProperty.member
+				this.calendarObjectInstanceStore.removeAttendee({
+					calendarObjectInstance: this.calendarObjectInstance,
+					attendee: modifiedMember,
+				})
+				member = member.split(',')
+				member.push(group)
+			}
+
 			this.calendarObjectInstanceStore.addAttendee({
 				calendarObjectInstance: this.calendarObjectInstance,
 				commonName,
