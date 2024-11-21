@@ -203,7 +203,7 @@ export default {
 					groupName,
 				})
 			} catch (error) {
-				console.debug(error)
+				console.error('Failed to fetch contact group members', error)
 				return []
 			}
 
