@@ -497,7 +497,7 @@ export default defineStore('calendarObjectInstance', {
 					if (Array.isArray(member.attendeeProperty.member) && member.attendeeProperty.member.length > 1) {
 						const removeIndex = member.attendeeProperty.member.findIndex(function(groupname) {
 							if (groupname === attendee.uri) {
-							  return true
+								return true
 							}
 							return false
 						})
