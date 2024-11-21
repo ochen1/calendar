@@ -295,11 +295,6 @@ export default {
 					return false
 				}
 
-				// We do not support GROUPS for now
-				if (principal.calendarUserType === 'GROUP') {
-					console.debug(principal)
-				}
-
 				// Do not include resources and rooms
 				if (['ROOM', 'RESOURCE'].includes(principal.calendarUserType)) {
 					return false
