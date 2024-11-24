@@ -226,14 +226,6 @@ export default {
 			}
 		},
 	},
-	watch: {
-		participationStatus: {
-			immediate: true,
-			handler(participationStatus) {
-				console.log('participationStatus', participationStatus)
-			},
-		}
-	},
 }
 </script>
 <style lang="scss" scoped>
