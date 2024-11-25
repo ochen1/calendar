@@ -5,7 +5,7 @@
 
 <template>
 	<NcDialog size="large"
-		:name="$t('calendar', 'Availability of attendees, resources and rooms')"
+		:name="dialogName"
 		@closing="$emit('close')">
 		<div class="modal__content modal--scheduler">
 			<div v-if="loadingIndicator" class="loading-indicator">
@@ -107,7 +107,8 @@
 					<p>{{ formattedCurrentTime }}<span class="modal__content__footer__title__timezone">{{ formattedTimeZone }}</span></p>
 				</div>
 
-				<NcButton type="primary"
+				<NcButton v-if="showDoneButton"
+					type="primary"
 					@click="save">
 					{{ $t('calendar', 'Done') }}
 					<template #icon>
@@ -201,15 +202,19 @@ export default {
 		},
 		eventTitle: {
 			type: String,
-			required: false,
+			default: '',
 		},
 		alreadyInvitedEmails: {
 			type: Array,
-			required: true,
+			default: () => [],
 		},
-		calendarObjectInstance: {
-			type: Object,
-			required: true,
+		dialogName: {
+			type: String,
+			default: () => $t('calendar', 'Availability of attendees, resources and rooms'),
+		},
+		showDoneButton: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

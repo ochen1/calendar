@@ -22,7 +22,7 @@ __webpack_nonce__ = btoa(getRequestToken())
 // eslint-disable-next-line
 __webpack_public_path__ = linkTo('calendar', 'js/')
 
-registerContactsMenuHook('calendar-availability', async () => {
+registerContactsMenuHook('calendar-availability', async (args) => {
 	const { default: Vue } = await import('vue')
 	const { default: ContactsMenuAvailability } = await import('./views/ContactsMenuAvailability.vue')
 	const { translate, translatePlural } = await import('@nextcloud/l10n')
@@ -52,7 +52,11 @@ registerContactsMenuHook('calendar-availability', async () => {
 
 	const View = Vue.extend(ContactsMenuAvailability)
 	const vm = new View({
-		propsData: {},
+		propsData: {
+			userId: args.uid,
+			userDisplayName: args.fullName,
+			userEmail: args.emailAddresses[0],
+		},
 		pinia,
 	})
 	vm.$mount(el)
